@@ -2,6 +2,7 @@
   "logout": "Logout",
   "appTitle": "Supplier OS Application",
   "routes": {
+    "/": "Bug Bounty Challenge",
     "/home": "Bug Bounty Challenge"
   },
   "home": {

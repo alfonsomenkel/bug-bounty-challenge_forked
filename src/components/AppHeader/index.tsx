@@ -1,4 +1,4 @@
-import { Grow, Box, Theme, Toolbar, Typography } from "@mui/material";
+import { Grow, Box, Theme, Toolbar, Typography, Select, MenuItem } from "@mui/material";
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
 import { styled, useTheme } from "@mui/material/styles";
 import React, { useEffect, useState } from "react";
@@ -29,10 +29,11 @@ const AppBar = styled(MuiAppBar)<AppBarProps>(({ theme }) => ({
   height: theme.tokens.header.height
 }));
 
-const AppHeader = React.forwardRef((props: AppHeaderProps, ref) => {
+const AppHeader = React.forwardRef<HTMLDivElement, AppHeaderProps>((props: AppHeaderProps, ref) => {
   const { user, pageTitle } = props;
   const { t } = useTranslation("app");
   const theme = useTheme();
+  const { i18n } = useTranslation();
 
   const [count, setCount] = useState(0);
   const hours = 1;
@@ -43,10 +44,18 @@ const AppHeader = React.forwardRef((props: AppHeaderProps, ref) => {
   const countdownSeconds = (countdown % 60).toFixed(0).padStart(2, "0");
 
   useEffect(() => {
-    setInterval(() => {
+    const intervalId = setInterval(() => {
       setCount((c) => c + 1);
     }, 1000);
+
+    return () => {
+      clearInterval(intervalId);
+    };
   }, []);
+
+  const handleLanguageChange = (event: any) => {
+    i18n.changeLanguage(event.target.value);
+  };
 
   return (
     <AppBar ref={ref} position="fixed" sx={{ width: "100vw" }}>
@@ -79,7 +88,17 @@ const AppHeader = React.forwardRef((props: AppHeaderProps, ref) => {
               {pageTitle.toLocaleUpperCase()}
             </Typography>
           </Box>
-          <Box sx={{ flex: 1, justifyContent: "flex-end", display: "flex" }}>
+          <Box sx={{ flex: 1, justifyContent: "flex-end", display: "flex", alignItems: "center" }}>
+            <Select
+              value={i18n.language}
+              onChange={handleLanguageChange}
+              sx={{ color: "white", marginRight: 2, ".MuiSvgIcon-root": { color: "white" } }}
+              variant="standard"
+              disableUnderline
+            >
+              <MenuItem value="en">English</MenuItem>
+              <MenuItem value="de">Deutsch</MenuItem>
+            </Select>
             {user && user.eMail && (
               <Grow in={Boolean(user && user.eMail)}>
                 <AvatarMenu user={user} />

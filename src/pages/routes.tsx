@@ -29,6 +29,11 @@ const lazyLoad = (Component: any) => () => (
 
 export const routes: TRoute[] = [
   {
+    path: ERoute.ROOT,
+    Icon: <Icon path={mdiHome} size={1} />,
+    Component: lazyLoad(Home)
+  },
+  {
     path: ERoute.HOME,
     Icon: <Icon path={mdiHome} size={1} />,
     Component: lazyLoad(Home)

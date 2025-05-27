@@ -7,7 +7,6 @@ import { observer } from "mobx-react";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { TRoute } from "../../types/global";
-import { resultOrError } from "../../utils/global";
 import AccessDenied from "../AccessDenied";
 import { routes as useRoutes } from "../routes";
 
@@ -15,9 +14,18 @@ const hideSplashScreen = () => {
   const splashscreen = document.getElementById("app-splashscreen");
 
   if (splashscreen) {
+    // Remove the class that makes it visible (has opacity: 1 !important).
+    // This should allow the original inline style (opacity: 0 and transition) on the element to take effect.
     splashscreen.className = "";
+    
+    // Ensure pointer events are off during and after transition.
+    splashscreen.style.pointerEvents = "none"; 
+
+    // Remove the element after the transition completes (0.3s = 300ms from CSS transition).
     setTimeout(() => {
-      splashscreen.remove();
+      if (splashscreen.parentNode) {
+        splashscreen.parentNode.removeChild(splashscreen);
+      }
     }, 300);
   }
 };
@@ -37,11 +45,19 @@ const Root = () => {
     { matchOnSubPath: true }
   );
 
-  let pageTitle = t(`routes.${route.path}`);
-
-  if (route.path.indexOf("data") > -1 || route.path.indexOf("settings") > -1) {
-    const [, groupName] = route.path.split("/");
-    pageTitle = t(`routes./${groupName}`);
+  let pageTitle = "Home"; // Default title
+  if (route && route.path) {
+    try {
+      pageTitle = t(`routes.${route.path}`);
+      
+      if (route.path.indexOf("data") > -1 || route.path.indexOf("settings") > -1) {
+        const [, groupName] = route.path.split("/");
+        pageTitle = t(`routes./${groupName}`);
+      }
+    } catch (error) {
+      console.warn("Error getting page title:", error);
+      pageTitle = "Home";
+    }
   }
 
   const loadingApp = false;

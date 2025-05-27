@@ -97,9 +97,9 @@ const useMatchedRoute = (
   }, [transition]);
 
   return {
-    route: route,
+    route: route || routes[0],
     params:
-      match && validateParams(route.path, match.params) ? match.params : {},
+      match && route && validateParams(route.path, match.params) ? match.params : {},
     MatchedElement: (
       <Switch>
         {matchOnSubPath &&

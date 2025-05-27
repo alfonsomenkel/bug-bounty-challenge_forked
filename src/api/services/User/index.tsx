@@ -1,4 +1,4 @@
-import React, { createContext, useContext } from "react";
+import React, { createContext, useContext, useMemo } from "react";
 
 import Store from "./store";
 
@@ -8,11 +8,13 @@ CONTEXT / PROVIDER INIT
 
 const UserStoreContext = createContext<Store | null>(null);
 
-export const StoreProvider: React.FC = (props) => {
+export const StoreProvider: React.FC<{ children: React.ReactNode }> = (props) => {
   const { children } = props;
 
+  const store = useMemo(() => new Store(), []);
+
   return (
-    <UserStoreContext.Provider value={new Store()}>
+    <UserStoreContext.Provider value={store}>
       {children}
     </UserStoreContext.Provider>
   );

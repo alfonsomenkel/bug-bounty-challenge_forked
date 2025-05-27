@@ -3,7 +3,7 @@ import { SnackbarProvider } from "notistack";
 
 import { HashRouter } from "react-router-dom";
 
-import services from "./api/services";
+// import services from "./api/services"; // Commented out as it's not used directly here
 
 import { CssBaseline } from "@mui/material";
 import { ThemeProvider } from "@mui/material/styles";
@@ -14,6 +14,7 @@ import { osapiens } from "./themes";
 
 import "./i18n";
 import { StoreProvider as UserStoreProvider } from "./api/services/User";
+import ErrorBoundary from "./components/ErrorBoundary"; // Import the ErrorBoundary
 
 const theme = osapiens.light;
 
@@ -26,7 +27,7 @@ const classes = {
   info: `${PREFIX}-info`
 };
 
-const CombinedStoreProvider: React.FC<{}> = ({ children }) => {
+const CombinedStoreProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return <UserStoreProvider>{children}</UserStoreProvider>;
 };
 
@@ -37,25 +38,27 @@ const AppContainer = () => {
       {/* Kickstart a simple scoped CSS baseline to build upon. */}
       {/* Required to override Material-UI's styles via CSS modules. */}
       <Suspense fallback={<div>loading...</div>}>
-        <CombinedStoreProvider>
-          <SnackbarProvider
-            maxSnack={3}
-            classes={{
-              variantSuccess: classes.success,
-              variantError: classes.error,
-              variantWarning: classes.warning,
-              variantInfo: classes.info
-            }}
-          >
-            <StylesProvider injectFirst>
-              <ThemeProvider theme={theme}>
-                <HashRouter>
-                  <RootComponent />
-                </HashRouter>
-              </ThemeProvider>
-            </StylesProvider>
-          </SnackbarProvider>
-        </CombinedStoreProvider>
+        <ErrorBoundary> {/* Wrap with ErrorBoundary */}
+          <CombinedStoreProvider>
+            <SnackbarProvider
+              maxSnack={3}
+              classes={{
+                variantSuccess: classes.success,
+                variantError: classes.error,
+                variantWarning: classes.warning,
+                variantInfo: classes.info
+              }}
+            >
+              <StylesProvider injectFirst>
+                <ThemeProvider theme={theme}>
+                  <HashRouter>
+                    <RootComponent />
+                  </HashRouter>
+                </ThemeProvider>
+              </StylesProvider>
+            </SnackbarProvider>
+          </CombinedStoreProvider>
+        </ErrorBoundary>
       </Suspense>
     </>
   );
